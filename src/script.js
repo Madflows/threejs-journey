@@ -1,8 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-
-
 // cursor
 const cursor = {
   x: 0,
@@ -23,9 +21,45 @@ const canvas = document.querySelector('canvas.webgl');
 
 // Sizes
 const sizes = {
-  width: 700,
-  height: 500,
+  width: window.innerWidth,
+  height: window.innerHeight,
 };
+
+// Resize the canvas when the window is resized.
+window.addEventListener('resize', () => {
+  sizes.width = window.innerWidth; // 	Width of the canvas element.
+  sizes.height = window.innerHeight; // 	Height of the canvas element.
+
+  // update camera
+  camera.aspect = sizes.width / sizes.height; // aspect ratio of the canvas. 	// aspect ratio of the camera. 	//
+  camera.updateProjectionMatrix();
+
+  // Update renderer
+  renderer.setSize(sizes.width, sizes.height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+});
+
+/**
+Handle full screen
+**/
+window.addEventListener('dblclick', () => {
+  const fullscreenElement =
+    document.fullscreenElement || document.webkitFullscreenElement;
+
+  if (!fullscreenElement) {
+    if (canvas.requestFullscreen) {
+      canvas.requestFullscreen();
+    } else if (canvas.webkitRequestFullscreen) {
+      canvas.webkitRequestFullscreen();
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+  }
+});
 
 // Scene
 const scene = new THREE.Scene();
@@ -54,17 +88,16 @@ camera.position.z = 3;
 camera.lookAt(mesh.position);
 scene.add(camera);
 
-// Controls 
+// Controls
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
-// controls.target.y = 1
-// controls.update()
 
 // Renderer
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
 });
 renderer.setSize(sizes.width, sizes.height);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 // Animate
 const clock = new THREE.Clock();
