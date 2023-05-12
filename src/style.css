@@ -2,6 +2,7 @@
 {
     margin: 0;
     padding: 0;
+    font-family: 'Inter', sans-serif;
 }
 
 html,
@@ -16,4 +17,14 @@ body
     top: 0;
     left: 0;
     outline: none;
+}
+
+.loader {
+    position: fixed;
+    inset: 0;
+    background: #000008;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
 }
