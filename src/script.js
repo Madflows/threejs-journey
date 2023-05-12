@@ -1,5 +1,21 @@
 import * as THREE from 'three';
+import GUI from 'lil-gui';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import gsap from 'gsap';
+
+// Debug
+const gui = new GUI(); // Object to hold all of our gui's in.
+
+const parameters = {
+  spin: () => {
+    gsap.to(mesh.rotation, {
+      duration: 1,
+      ease: 'cubic-bezier(.33,1,.68,1)',
+      y: mesh.rotation.y + Math.PI * 2,
+      x: mesh.rotation.x + Math.PI * 2,
+    });
+  }
+}
 
 /**
  * Base
@@ -10,37 +26,38 @@ const canvas = document.querySelector('canvas.webgl');
 // Scene
 const scene = new THREE.Scene();
 
-// Object
-// const geometry = new THREE.BoxGeometry(1, 1, 1);
-
-// const positionsArray = new Float32Array([
-//   0,0,0,
-//   0,1,0,
-//   1,0,0
-// ]);
-// const positionsAttribute = new THREE.BufferAttribute(positionsArray, 3)
-// geometry.setAttribute('position', positionsAttribute);
-
-const geometry = new THREE.BufferGeometry();
-
-const count = 1000;
-const positionsArray = new Float32Array(count * 3 * 3);
-
-for(let i = 0; i < count * 3 * 3; i++){
-  positionsArray[i] = Math.random() - 0.5;
-}
-
-const positionsAttribute = new THREE.BufferAttribute(positionsArray, 3);
-geometry.setAttribute('position', positionsAttribute)
-
-const material = new THREE.MeshBasicMaterial({
-  color: 0x3388b8,
-  wireframe: true,
-});
+/**
+ * Object
+ */
+const geometry = new THREE.BoxGeometry(1, 1, 1);
+const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
 const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh);
 
-// Sizes
+// GUI Tweaks
+gui.add(mesh.position, 'y')
+  .min(-3)
+  .max(3)
+  .step(0.01)
+  .name('elevation');
+
+gui
+  .add(mesh, 'visible');
+
+gui
+  .add(material, 'wireframe');
+
+gui
+  .addColor(material, 'color')
+  .name('boxColor')
+
+gui
+  .add(parameters, 'spin')
+  .name('Spin the box :)')
+
+  /**
+ * Sizes
+ */
 const sizes = {
   width: window.innerWidth,
   height: window.innerHeight,
@@ -60,7 +77,10 @@ window.addEventListener('resize', () => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
-// Camera
+/**
+ * Camera
+ */
+// Base camera
 const camera = new THREE.PerspectiveCamera(
   75,
   sizes.width / sizes.height,
@@ -74,14 +94,18 @@ scene.add(camera);
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 
-// Renderer
+/**
+ * Renderer
+ */
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
 });
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-// Animate
+/**
+ * Animate
+ */
 const clock = new THREE.Clock();
 
 const tick = () => {
