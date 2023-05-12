@@ -1,21 +1,5 @@
 import * as THREE from 'three';
-import GUI from 'lil-gui';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import gsap from 'gsap';
-
-// Debug
-const gui = new GUI(); // Object to hold all of our gui's in.
-
-const parameters = {
-  spin: () => {
-    gsap.to(mesh.rotation, {
-      duration: 1,
-      ease: 'cubic-bezier(.33,1,.68,1)',
-      y: mesh.rotation.y + Math.PI * 2,
-      x: mesh.rotation.x + Math.PI * 2,
-    });
-  }
-}
 
 /**
  * Base
@@ -34,28 +18,7 @@ const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
 const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh);
 
-// GUI Tweaks
-gui.add(mesh.position, 'y')
-  .min(-3)
-  .max(3)
-  .step(0.01)
-  .name('elevation');
-
-gui
-  .add(mesh, 'visible');
-
-gui
-  .add(material, 'wireframe');
-
-gui
-  .addColor(material, 'color')
-  .name('boxColor')
-
-gui
-  .add(parameters, 'spin')
-  .name('Spin the box :)')
-
-  /**
+/**
  * Sizes
  */
 const sizes = {
@@ -87,7 +50,9 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-camera.position.z = 3;
+camera.position.x = 1;
+camera.position.y = 1;
+camera.position.z = 1;
 scene.add(camera);
 
 // Controls
