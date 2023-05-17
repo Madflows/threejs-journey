@@ -1,30 +1,34 @@
-*
-{
-    margin: 0;
-    padding: 0;
-    font-family: 'Inter', sans-serif;
+* {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
 }
 
 html,
-body
-{
-    overflow: hidden;
+body {
+  overflow: hidden;
 }
 
-.webgl
-{
-    position: fixed;
-    top: 0;
-    left: 0;
-    outline: none;
+.webgl {
+  position: fixed;
+  top: 0;
+  left: 0;
+  outline: none;
 }
 
 .loader {
-    position: fixed;
-    inset: 0;
-    background: #000008;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
+  position: fixed;
+  inset: 0;
+  background: #000008;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+canvas {
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: pixelated;
+  image-rendering: optimize-contrast;
 }
