@@ -1,9 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'; //for loading font from web server
-import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'; //for text display in scene, with animation and
 import * as dat from 'lil-gui';
-import { gsap } from 'gsap';
 
 /**
  * Base
@@ -11,113 +8,48 @@ import { gsap } from 'gsap';
 // Debug
 const gui = new dat.GUI();
 
-// cursor
-const cursor = {
-  x: 0,
-  y: 0,
-};
-
-window.addEventListener('mousemove', (e) => {
-  cursor.x = e.clientX / sizes.width - 0.5;
-  cursor.y = -(e.clientY / sizes.height - 0.5);
-  // console.log(cursor);
-});
-
-// Data
-const data = {
-  text: 'Folarin Lawal\nCreative Developer',
-};
-
-let textPosition;
-
-gui.add(data, 'text');
-
 // Canvas
 const canvas = document.querySelector('canvas.webgl');
 
 // Scene
 const scene = new THREE.Scene();
 
-scene.background = new THREE.Color(0x292929);
+/**
+ * Lights
+ */
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
+
+const pointLight = new THREE.PointLight(0xffffff, 0.5);
+pointLight.position.x = 2;
+pointLight.position.y = 3;
+pointLight.position.z = 4;
+scene.add(pointLight);
 
 /**
- * Textures
+ * Objects
  */
-const textureLoader = new THREE.TextureLoader();
+// Material
+const material = new THREE.MeshStandardMaterial();
+material.roughness = 0.4;
 
-const matcapTexture = textureLoader.load('/textures/matcaps/8.png');
+// Objects
+const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), material);
+sphere.position.x = -1.5;
 
-// Fonts
-const fontLoader = new FontLoader();
-fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-  const textGeometry = new TextGeometry(data.text, {
-    font,
-    size: 0.5,
-    height: 0.4,
-    curveSegments: 5,
-    bevelEnabled: true,
-    bevelThickness: 0.03,
-    bevelSize: 0.02,
-    bevelOffset: 0,
-    bevelSegments: 4,
-  });
+const cube = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.75, 0.75), material);
 
-  // textGeometry.computeBoundingBox();
+const torus = new THREE.Mesh(
+  new THREE.TorusGeometry(0.3, 0.2, 32, 64),
+  material
+);
+torus.position.x = 1.5;
 
-  // // Center the text geometry
-  // textGeometry.translate(
-  //   - (textGeometry.boundingBox.max.x - 0.02) * 0.5,
-  //   - (textGeometry.boundingBox.max.y - 0.02) * 0.5,
-  //   - (textGeometry.boundingBox.max.z - 0.03) * 0.5,
-  // )
+const plane = new THREE.Mesh(new THREE.PlaneGeometry(5, 5), material);
+plane.rotation.x = -Math.PI * 0.5;
+plane.position.y = -0.65;
 
-  textGeometry.center();
-
-  const material = new THREE.MeshMatcapMaterial({
-    matcap: matcapTexture,
-  });
-  // const material = new THREE.MeshNormalMaterial();
-  const text = new THREE.Mesh(textGeometry, material);
-
-  textPosition = text.position;
-
-  scene.add(text);
-  camera.lookAt(text.position);
-  const donutGeometry = new THREE.TorusGeometry(0.3, 0.2, 20, 45);
-  const cubeGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-
-  for (let i = 0; i < 150; i++) {
-    const donut = new THREE.Mesh(donutGeometry, material);
-    const cube = new THREE.Mesh(cubeGeometry, material);
-
-    donut.position.x = (Math.random() - 0.5) * 10;
-    donut.position.y = (Math.random() - 0.5) * 10;
-    donut.position.z = (Math.random() - 0.5) * 10;
-
-    cube.position.x = (Math.random() - 0.5) * 10;
-    cube.position.y = (Math.random() - 0.5) * 10;
-    cube.position.z = (Math.random() - 0.5) * 10;
-
-    donut.rotation.x = Math.random() * Math.PI;
-    donut.rotation.y = Math.random() * Math.PI;
-
-    cube.rotation.x = Math.random() * Math.PI;
-    cube.rotation.y = Math.random() * Math.PI;
-
-    // Random scale
-    const donutScale = Math.random();
-    donut.scale.set(donutScale, donutScale, donutScale);
-
-    const cubeScale = Math.random();
-    cube.scale.set(cubeScale, cubeScale, cubeScale);
-
-    scene.add(donut, cube);
-  }
-});
-
-/**
- * Object
- */
+scene.add(sphere, cube, torus, plane);
 
 /**
  * Sizes
@@ -151,18 +83,14 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-// camera.position.x = 1;
-// camera.position.y = 1;
-camera.position.z = 5;
+camera.position.x = 1;
+camera.position.y = 1;
+camera.position.z = 2;
 scene.add(camera);
 
 // Controls
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
-
-// window.addEventListener('mousemove', (e) => {
-//   controls.handleMouseMoveRotate(e);
-// });
 
 /**
  * Renderer
@@ -178,29 +106,17 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
  */
 const clock = new THREE.Clock();
 
-let sceneTL = gsap.timeline();
-
-sceneTL
-  .from(camera.position, {
-    z: 500,
-    duration: 2,
-  })
-  .from(
-    scene.rotation,
-    {
-      x: -Math.PI * 2,
-    },
-    '<'
-  );
-
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
 
-  // Update Camera
-  // camera.position.x = Math.sin(cursor.x * Math.PI);
-  // camera.position.z = Math.cos(cursor.x * Math.PI) * 2;
-  // camera.position.y = cursor.y * 5;
-  // camera.lookAt(new THREE.Vector3(0, 0, 0));
+  // Update objects
+  sphere.rotation.y = 0.1 * elapsedTime;
+  cube.rotation.y = 0.1 * elapsedTime;
+  torus.rotation.y = 0.1 * elapsedTime;
+
+  sphere.rotation.x = 0.15 * elapsedTime;
+  cube.rotation.x = 0.15 * elapsedTime;
+  torus.rotation.x = 0.15 * elapsedTime;
 
   // Update controls
   controls.update();
