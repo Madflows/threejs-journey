@@ -45,7 +45,7 @@ scene.background = new THREE.Color(0x292929);
  */
 const textureLoader = new THREE.TextureLoader();
 
-const matcapTexture = textureLoader.load('/textures/matcaps/3.png');
+const matcapTexture = textureLoader.load('/textures/matcaps/8.png');
 
 // Fonts
 const fontLoader = new FontLoader();
@@ -53,7 +53,7 @@ fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
   const textGeometry = new TextGeometry(data.text, {
     font,
     size: 0.5,
-    height: 0.2,
+    height: 0.4,
     curveSegments: 5,
     bevelEnabled: true,
     bevelThickness: 0.03,
