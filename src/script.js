@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import * as dat from 'lil-gui';
+import { gsap } from 'gsap';
 
 /**
  * Base
@@ -21,7 +22,8 @@ scene.fog = fog;
 /**
  * Textures
  */
-const textureLoader = new THREE.TextureLoader();
+const loadingManager = new THREE.LoadingManager();
+const textureLoader = new THREE.TextureLoader(loadingManager);
 
 // Door Textures
 const doorColorTexture = textureLoader.load('/textures/door/color.jpg');
@@ -54,6 +56,26 @@ const grassRoughnessTexture = textureLoader.load(
   '/textures/grass/roughness.jpg'
 );
 
+loadingManager.onLoad = () => {
+  let loaderTL = gsap.timeline();
+  loaderTL
+    .to('.loader h2', {
+      autoAlpha: 0,
+      duration: 1,
+      delay: 1,
+    })
+    .to('.loader span', {
+      autoAlpha: 0,
+      delay: 3
+    })
+    .to('.loader', {
+      yPercent: -100,
+      delay: 1,
+      duration: 1,
+      ease: "power4.in"
+    });
+};
+
 grassColorTexture.repeat.set(8, 8);
 grassAmbientOcclusionTexture.repeat.set(8, 8);
 grassNormalTexture.repeat.set(8, 8);
@@ -68,7 +90,6 @@ grassColorTexture.wrapT = THREE.RepeatWrapping;
 grassAmbientOcclusionTexture.wrapT = THREE.RepeatWrapping;
 grassNormalTexture.wrapT = THREE.RepeatWrapping;
 grassRoughnessTexture.wrapT = THREE.RepeatWrapping;
-
 
 /**
  * House
@@ -223,7 +244,7 @@ house.add(doorLight);
 const ghost1 = new THREE.PointLight('#ff00ff', 2, 3);
 const ghost2 = new THREE.PointLight('#00ffff', 2, 3);
 const ghost3 = new THREE.PointLight('#ffff00', 2, 3);
-scene.add(ghost1, ghost2, ghost3)
+scene.add(ghost1, ghost2, ghost3);
 
 /**
  * Sizes
@@ -278,7 +299,7 @@ renderer.setClearColor('#262837');
 
 // Shadows
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 moonLight.castShadow = true;
 doorLight.castShadow = true;
@@ -287,10 +308,10 @@ ghost2.castShadow = true;
 ghost3.castShadow = true;
 
 walls.castShadow = true;
-bush1.castShadow =true;
-bush2.castShadow =true;
-bush3.castShadow =true;
-bush4.castShadow =true;
+bush1.castShadow = true;
+bush2.castShadow = true;
+bush3.castShadow = true;
+bush4.castShadow = true;
 
 floor.receiveShadow = true;
 
@@ -309,7 +330,6 @@ ghost3.shadow.mapSize.width = 256;
 ghost3.shadow.mapSize.height = 256;
 ghost3.shadow.camera.far = 7;
 
-
 /**
  * Animate
  */
@@ -323,16 +343,17 @@ const tick = () => {
   ghost1.position.x = Math.cos(ghost1Angle) * 4;
   ghost1.position.z = Math.sin(ghost1Angle) * 4;
   ghost1.position.y = Math.sin(elapsedTime * 3);
-  
-  const ghost2Angle = - elapsedTime * 0.32;
+
+  const ghost2Angle = -elapsedTime * 0.32;
   ghost2.position.x = Math.cos(ghost2Angle) * 5;
   ghost2.position.z = Math.sin(ghost2Angle) * 5;
   ghost2.position.y = Math.sin(elapsedTime * 4) + Math.sin(elapsedTime * 2.5);
 
-    const ghost3Angle = - elapsedTime * 0.18;
-    ghost3.position.x = Math.cos(ghost3Angle) * (7 + Math.sin(elapsedTime * 0.32));
-    ghost3.position.z = Math.sin(ghost3Angle) * (7 + Math.sin(elapsedTime * 0.5));
-    ghost3.position.y = Math.sin(elapsedTime * 4) + Math.sin(elapsedTime * 2.5);
+  const ghost3Angle = -elapsedTime * 0.18;
+  ghost3.position.x =
+    Math.cos(ghost3Angle) * (7 + Math.sin(elapsedTime * 0.32));
+  ghost3.position.z = Math.sin(ghost3Angle) * (7 + Math.sin(elapsedTime * 0.5));
+  ghost3.position.y = Math.sin(elapsedTime * 4) + Math.sin(elapsedTime * 2.5);
   // Update controls
   controls.update();
 
