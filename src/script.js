@@ -8,9 +8,9 @@ import { SplitText } from 'gsap/SplitText';
 gsap.registerPlugin(SplitText);
 
 // Hide Loader for now
-gsap.set('.loader', {
-  autoAlpha: 0,
-});
+// gsap.set('.loader', {
+//   autoAlpha: 0,
+// });
 
 /**
  * Base
