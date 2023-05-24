@@ -9,6 +9,10 @@
     font-family: 'Bai Jamjuree', sans-serif;
 }
 
+body{
+    @apply h-screen w-screen overflow-hidden;
+}
+
 .webgl {
     position: fixed;
     top: 0;

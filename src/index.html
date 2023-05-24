@@ -3,17 +3,43 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Haunted House - ThreeJS Journey</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Particles - ThreeJS Journey</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <canvas class="webgl"></canvas>
-    <div class="absolute inset-0 bg-black loader flex items-center justify-center">
-      <h2 class="text-white text-sm uppercase font-bold">Building an exceptional experience</h2>
-      <span class="w-4 h-4 rounded-full border-2 border-black border-t-white animate-spin absolute bottom-[30vh]"></span>
+    <div
+      class="absolute z-20 inset-0 bg-black loader flex flex-col items-center gap-4 justify-center"
+    >
+      <div
+        class="w-[90vw] max-w-xs flex items-center justify-center gap-4 text-3xl text-white"
+      >
+        <i class="ph-duotone ph-file-html"></i>
+        <i class="ph-duotone ph-file-css"></i>
+        <i class="ph-duotone ph-file-js"></i>
+      </div>
+      <h2 class="text-white text-sm uppercase font-bold">
+        Building an exceptional experience
+      </h2>
+      <span
+        class="w-4 h-4 rounded-full border-2 border-black border-t-white animate-spin absolute bottom-[30vh]"
+      ></span>
+    </div>
+
+    <div
+      class="z-10 absolute drag-helper bottom-10 left-1/2 text-white items-center -translate-x-1/2 flex flex-col gap-2"
+    >
+      <i class="ph-duotone ph-atom text-3xl rotate-12"></i>
+      <span class="text-xs text-center font-medium uppercase"
+        >Drag to control</span
+      >
     </div>
 
     <script type="module" src="./script.js"></script>
