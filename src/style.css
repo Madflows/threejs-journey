@@ -3,20 +3,25 @@
 @tailwind utilities;
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Bai Jamjuree', sans-serif;
+  font-family: 'Bai Jamjuree', sans-serif;
 }
 
-body{
-    @apply h-screen w-screen overflow-hidden;
+html {
+  @apply bg-[#1e1a20];
+}
+
+body {
+  @apply h-screen w-screen overflow-x-hidden;
 }
 
 .webgl {
-    position: fixed;
-    top: 0;
-    left: 0;
-    outline: none;
+  @apply fixed top-0 left-0 outline-none;
 }
 
+.section {
+  @apply flex items-center h-screen relative text-[#ffeded] uppercase text-[7vmin] px-[10%] font-black;
+}
+
+section:nth-child(odd) {
+  @apply justify-end;
+}
