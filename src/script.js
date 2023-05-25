@@ -8,9 +8,9 @@ import { SplitText } from 'gsap/SplitText';
 gsap.registerPlugin(SplitText);
 
 // Hide Loader for now
-// gsap.set('.loader', {
-//   autoAlpha: 0,
-// });
+gsap.set('.loader', {
+  autoAlpha: 0,
+});
 
 /**
  * Base
@@ -24,85 +24,108 @@ const canvas = document.querySelector('canvas.webgl');
 // Scene
 const scene = new THREE.Scene();
 
-
-/**
- * Textures
- */
-const loadingManager = new THREE.LoadingManager();
-const textureLoader = new THREE.TextureLoader(loadingManager);
-
-// Load Textures
-const particleTexture = textureLoader.load('/textures/particles/9.png');
-const planetTexture = textureLoader.load('/textures/2k_moon.jpg');
-
-// Animate loader on load
-loadingManager.onLoad = () => {
-  let loaderTL = gsap.timeline();
-  loaderTL
-    .to('.loader h2', {
-      autoAlpha: 0,
-      duration: 1,
-      delay: 1,
-    })
-    .to('.loader span', {
-      autoAlpha: 0,
-      delay: 3,
-    })
-    .to('.loader', {
-      yPercent: -100,
-      delay: 1,
-      duration: 1,
-      ease: 'power4.in',
-    });
+// Galaxy
+const parameters = {
+  count: 10000,
+  size: 0.02,
+  radius: 5,
+  branches: 3,
+  spin: 1,
+  randomness: 0.2,
+  scatterStrength: 3,
+  insideColor: '#ff5030',
+  outsideColor: '#1b3984',
 };
 
-/* Particles */
-// Geometry
-const particleGeometry = new THREE.BufferGeometry();
-const count = 10000;
+// tweaks
+const particlesGroup = gui.addFolder('Particles').onFinishChange(generateGalaxy);
+particlesGroup.add(parameters, 'count').min(100).max(100000).step(100).name('count');
+particlesGroup.add(parameters, 'size').min(0.001).max(0.1).step(0.001).name('size');
+gui.add(parameters, 'radius').min(0.01).max(20).step(0.01).name('radius').onFinishChange(generateGalaxy);
+gui.add(parameters, 'branches').min(2).max(20).step(1).name('branches').onFinishChange(generateGalaxy);
+gui.add(parameters, 'spin').min(-5).max(5).step(0.1).name('spiral').onFinishChange(generateGalaxy);
+gui.add(parameters, 'randomness').min(0).max(2).step(0.001).name('scatter').onFinishChange(generateGalaxy);
+gui.add(parameters, 'scatterStrength').min(1).max(10).step(0.1).name('scatterStrength').onFinishChange(generateGalaxy);
+gui.addColor(parameters, 'insideColor').name('innerColor').onFinishChange(generateGalaxy);
+gui.addColor(parameters, 'outsideColor').name('outerColor').onFinishChange(generateGalaxy);
 
-const positions = new Float32Array(count * 3);
-const colors = new Float32Array(count * 3);
+// instantiate variables
+let geometry = null;
+let material = null;
+let points = null;
 
-for (let i = 0; i < count * 3; i++) {
-  positions[i] = (Math.random() - 0.5) * 15;
-  colors[i] = Math.random();
+function generateGalaxy() {
+  // destroy previous model
+  if (points !== null) {
+    geometry.dispose();
+    material.dispose();
+    scene.remove(points);
+  }
+
+  geometry = new THREE.BufferGeometry();
+  const positions = new Float32Array(parameters.count * 3);
+  const colors = new Float32Array(parameters.count * 3);
+
+  const colorInside = new THREE.Color(parameters.insideColor);
+  const colorOutside = new THREE.Color(parameters.outsideColor);
+
+ 
+
+  for (let i = 0; i < parameters.count; i++) {
+    const i3 = i * 3;
+
+    // Position
+    const radius = Math.random() * parameters.radius;
+    const spinAngle = radius * parameters.spin;
+    const branchAngle = (i % parameters.branches) / parameters.branches * Math.PI * 2;
+
+    // randomness
+    const randomX = Math.pow(Math.random(), parameters.scatterStrength) * (Math.random() < 0.5 ? 1 : -1)
+    const randomY = Math.pow(Math.random(), parameters.scatterStrength) * (Math.random() < 0.5 ? 1 : -1)
+    const randomZ = Math.pow(Math.random(), parameters.scatterStrength) * (Math.random() < 0.5 ? 1 : -1)
+
+    positions[i3] =   Math.cos(branchAngle + spinAngle) * radius + randomX;
+    positions[i3 + 1] = randomY;
+    positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ;
+
+    // Color 
+     const mixedColor = colorInside.clone();
+     mixedColor.lerp(colorOutside, radius / parameters.radius);
+
+    colors[i3] = mixedColor.r
+    colors[i3 + 1] = mixedColor.g
+    colors[i3 + 2] = mixedColor.b
+  }
+
+
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+  // Material
+  material = new THREE.PointsMaterial({
+    size: parameters.size,
+    sizeAttenuation: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    vertexColors: true
+  });
+
+  // mesh
+  points = new THREE.Points(geometry, material);
+  scene.add(points);
 }
 
-particleGeometry.setAttribute(
-  'position',
-  new THREE.BufferAttribute(positions, 3)
-);
-particleGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+generateGalaxy();
 
-// Material
-const particlesMaterial = new THREE.PointsMaterial();
-particlesMaterial.size = 0.07;
-particlesMaterial.sizeAttenuation = true;
-particlesMaterial.color = new THREE.Color(0xffffff);
-particlesMaterial.transparent = true;
-particlesMaterial.alphaMap = particleTexture;
-// particlesMaterial.alphaTest = 0.001;
-// particlesMaterial.depthTest = false;
-particlesMaterial.depthWrite = false;
-particlesMaterial.blending = THREE.AdditiveBlending;
-// particlesMaterial.vertexColors = true;
-
-gui.addColor(particlesMaterial, 'color').name('particleColor');
-
-// points
-const particles = new THREE.Points(particleGeometry, particlesMaterial);
-scene.add(particles);
-
-const sphere = new THREE.Mesh(
-  new THREE.SphereGeometry(),
-  new THREE.MeshBasicMaterial({
-    wireframe: true,
-    map: planetTexture,
-  })
-);
+// add a small sphere
+const sphereGeo = new THREE.SphereGeometry(0.1);
+const sphereMat = new THREE.MeshBasicMaterial({
+  wireframe: true,
+});
+const sphere = new THREE.Mesh(sphereGeo, sphereMat);
 
 scene.add(sphere);
+
 /**
  * Sizes
  */
@@ -135,13 +158,14 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
+camera.position.x = 3;
+camera.position.y = 3;
 camera.position.z = 3;
 scene.add(camera);
 
 // Controls
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
-controls.enableZoom = false;
 
 /**
  * Renderer
@@ -159,20 +183,6 @@ const clock = new THREE.Clock();
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
-
-  // Animate particles
-  particles.rotation.y = elapsedTime * 0.02;
-
-  // for (let i = 0; i < count; i++) {
-  //   const i3 = i * 3;
-  //   const x = particleGeometry.attributes.position.array[i3 + 0];
-  //   particleGeometry.attributes.position.array[i3 + 1] = Math.sin(elapsedTime + x)
-  // }
-  // particleGeometry.attributes.position.needsUpdate = true
-  // animate planet
-  sphere.rotation.y = -elapsedTime * 0.1;
-  sphere.rotation.x = -elapsedTime * 0.1;
-
 
   // Update controls
   controls.update();
@@ -194,11 +204,9 @@ const splitText = new SplitText('.drag-helper span', {
   type: 'chars',
 });
 let chars = splitText.chars;
-rotateTL
-  .to('.drag-helper i', {
+rotateTL.to('.drag-helper i', {
     rotate: '90deg',
-  })
-  .to(
+  }).to(
     chars,
     {
       yPercent: 100,
@@ -206,8 +214,7 @@ rotateTL
       stagger: 0.05,
     },
     '<'
-  )
-  .to(
+  ).to(
     '.drag-helper',
     {
       autoAlpha: 0,
